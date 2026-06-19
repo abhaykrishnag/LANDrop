@@ -1,3 +1,4 @@
+import UploadBox from "./components/uploadbox";
 import FileList from "./components/filelist";
 
 function App() {
@@ -11,7 +12,12 @@ function App() {
       }}
     >
       <h1>LANDrop</h1>
-      <p>Wireless Local File Transfer</p>
+
+      <p>
+        Wireless Local File Transfer
+      </p>
+
+      <UploadBox />
 
       <FileList />
     </div>
