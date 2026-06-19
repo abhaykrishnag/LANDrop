@@ -1,7 +1,14 @@
+import { useState } from "react";
 import UploadBox from "./components/uploadbox";
 import FileList from "./components/filelist";
 
 function App() {
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const refreshFiles = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
   return (
     <div
       style={{
@@ -13,13 +20,11 @@ function App() {
     >
       <h1>LANDrop</h1>
 
-      <p>
-        Wireless Local File Transfer
-      </p>
+      <p>Wireless Local File Transfer</p>
 
-      <UploadBox />
+      <UploadBox onUploadSuccess={refreshFiles} />
 
-      <FileList />
+      <FileList refreshTrigger={refreshTrigger} />
     </div>
   );
 }

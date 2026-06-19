@@ -6,12 +6,14 @@ interface FileItem {
   size: number;
 }
 
-export default function FileList() {
-  const [files, setFiles] = useState<FileItem[]>([]);
+interface FileListProps {
+  refreshTrigger: number;
+}
 
-  useEffect(() => {
-    fetchFiles();
-  }, []);
+export default function FileList({
+  refreshTrigger,
+}: FileListProps) {
+  const [files, setFiles] = useState<FileItem[]>([]);
 
   const fetchFiles = async () => {
     try {
@@ -21,6 +23,10 @@ export default function FileList() {
       console.error("Failed to fetch files:", error);
     }
   };
+
+  useEffect(() => {
+    fetchFiles();
+  }, [refreshTrigger]);
 
   return (
     <div

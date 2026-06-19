@@ -1,7 +1,13 @@
 import { useState } from "react";
 import API from "../services/api";
 
-export default function UploadBox() {
+interface UploadBoxProps {
+  onUploadSuccess: () => void;
+}
+
+export default function UploadBox({
+  onUploadSuccess,
+}: UploadBoxProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleUpload = async () => {
@@ -20,6 +26,8 @@ export default function UploadBox() {
       alert("File uploaded successfully!");
 
       setSelectedFile(null);
+
+      onUploadSuccess(); // Refresh file list
     } catch (error) {
       console.error(error);
       alert("Upload failed");
