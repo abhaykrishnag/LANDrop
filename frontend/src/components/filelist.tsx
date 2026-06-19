@@ -59,6 +59,25 @@ export default function FileList({
             <div>
               Size: {(file.size / 1024).toFixed(2)} KB
             </div>
+
+            <br />
+
+            <button
+              onClick={() =>
+                window.open(
+                  `http://localhost:8000/download/${file.name}`,
+                  "_blank"
+                )
+              }
+              style={{
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              Download
+            </button>
           </div>
         ))
       )}
