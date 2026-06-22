@@ -11,12 +11,17 @@ export default function UploadBox({
 }: UploadBoxProps) {
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [status, setStatus] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState("");
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
 
       if (!file) return;
+
+      setStatus("");
+      setUploadedFileName("");
 
       const formData = new FormData();
       formData.append("file", file);
@@ -41,17 +46,17 @@ export default function UploadBox({
         });
 
         setProgress(100);
+        setUploading(false);
 
-        setTimeout(() => {
-          setUploading(false);
-          setProgress(0);
-        }, 500);
+        setStatus("Upload Complete");
+        setUploadedFileName(file.name);
 
         onUploadSuccess();
       } catch (error) {
         console.error("Upload failed:", error);
+
         setUploading(false);
-        alert("Upload failed");
+        setStatus("Upload Failed");
       }
     },
     [onUploadSuccess]
@@ -88,11 +93,11 @@ export default function UploadBox({
             fontSize: "1.2rem",
           }}
         >
-          Drop the file here...
+          📂 Drop the file here...
         </p>
       ) : (
         <>
-          <h2>📤 Upload Files</h2>
+          <h2>Upload Files</h2>
 
           <p
             style={{
@@ -134,6 +139,33 @@ export default function UploadBox({
           </div>
         </div>
       )}
+
+      {status && (
+        <div
+          style={{
+            marginTop: "1rem",
+          }}
+        >
+          <p
+            style={{
+              fontWeight: "bold",
+            }}
+          >
+            {status}
+          </p>
+
+          {uploadedFileName && (
+            <p
+              style={{
+                color: "#94a3b8",
+                marginTop: "0.3rem",
+              }}
+            >
+              {uploadedFileName}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
-} 
+}

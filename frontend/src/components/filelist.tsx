@@ -15,6 +15,27 @@ export default function FileList({
 }: FileListProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
 
+  const getFileIcon = (name: string) => {
+    const ext = name.split(".").pop()?.toLowerCase();
+
+    switch (ext) {
+      case "pdf":
+        return "📄";
+      case "png":
+      case "jpg":
+      case "jpeg":
+        return "🖼️";
+      case "zip":
+        return "📦";
+      case "mp4":
+        return "🎥";
+      case "mp3":
+        return "🎵";
+      default:
+        return "📁";
+    }
+  };
+
   const fetchFiles = async () => {
     try {
       const response = await API.get("/files");
@@ -23,6 +44,23 @@ export default function FileList({
       console.error("Failed to fetch files:", error);
     }
   };
+
+  const deleteFile = async (filename: string) => {
+  const confirmed = window.confirm(
+    `Delete ${filename}?`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await API.delete(`/delete/${filename}`);
+
+    fetchFiles();
+  } catch (error) {
+    console.error(error);
+    alert("Delete failed");
+  }
+};
 
   useEffect(() => {
     fetchFiles();
@@ -37,7 +75,7 @@ export default function FileList({
         borderRadius: "12px",
       }}
     >
-      <h2>Available Files</h2>
+      <h2>📂 Available Files</h2>
 
       {files.length === 0 ? (
         <p>No files found.</p>
@@ -54,57 +92,64 @@ export default function FileList({
           >
             <div>
               <strong>
-  {getFileIcon(file.name)} {file.name}
-</strong>
+                {getFileIcon(file.name)} {file.name}
+              </strong>
             </div>
 
-            <div>
+            <div
+              style={{
+                marginTop: "6px",
+                color: "#cbd5e1",
+              }}
+            >
               Size: {(file.size / 1024).toFixed(2)} KB
             </div>
 
             <br />
 
-            <button
-              onClick={() =>
-                window.open(
-                  `http://localhost:8000/download/${file.name}`,
-                  "_blank"
-                )
-              }
-              style={{
-  padding: "8px 16px",
-  backgroundColor: "#2563eb",
-  color: "white",
-  border: "none",
-  borderRadius: "8px",
-}}
-            >
-              ⬇ Download
-            </button>
+            <div
+  style={{
+    display: "flex",
+    gap: "10px",
+    marginTop: "12px",
+  }}
+>
+  <button
+    onClick={() =>
+      window.open(
+        `http://localhost:8000/download/${file.name}`,
+        "_blank"
+      )
+    }
+    style={{
+      padding: "8px 16px",
+      backgroundColor: "#2563eb",
+      color: "white",
+      border: "none",
+      borderRadius: "8px",
+      cursor: "pointer",
+    }}
+  >
+    ⬇ Download
+  </button>
+
+  <button
+    onClick={() => deleteFile(file.name)}
+    style={{
+      padding: "8px 16px",
+      backgroundColor: "#dc2626",
+      color: "white",
+      border: "none",
+      borderRadius: "8px",
+      cursor: "pointer",
+    }}
+  >
+    🗑 Delete
+  </button>
+</div>
           </div>
         ))
       )}
     </div>
   );
-
-  const getFileIcon = (name: string) => {
-  const ext = name.split(".").pop()?.toLowerCase();
-
-  switch (ext) {
-    case "pdf":
-      return "📄";
-    case "png":
-    case "jpg":
-    case "jpeg":
-      return "🖼️";
-    case "zip":
-      return "📦";
-    case "mp4":
-      return "🎥";
-    case "mp3":
-      return "🎵";
-    default:
-      return "📁";
-  }
-};
 }
