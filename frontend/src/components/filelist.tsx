@@ -53,7 +53,9 @@ export default function FileList({
             }}
           >
             <div>
-              <strong>{file.name}</strong>
+              <strong>
+  {getFileIcon(file.name)} {file.name}
+</strong>
             </div>
 
             <div>
@@ -70,17 +72,39 @@ export default function FileList({
                 )
               }
               style={{
-                padding: "8px 16px",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
+  padding: "8px 16px",
+  backgroundColor: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+}}
             >
-              Download
+              ⬇ Download
             </button>
           </div>
         ))
       )}
     </div>
   );
+
+  const getFileIcon = (name: string) => {
+  const ext = name.split(".").pop()?.toLowerCase();
+
+  switch (ext) {
+    case "pdf":
+      return "📄";
+    case "png":
+    case "jpg":
+    case "jpeg":
+      return "🖼️";
+    case "zip":
+      return "📦";
+    case "mp4":
+      return "🎥";
+    case "mp3":
+      return "🎵";
+    default:
+      return "📁";
+  }
+};
 }

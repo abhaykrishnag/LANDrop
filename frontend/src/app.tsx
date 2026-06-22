@@ -12,15 +12,32 @@ function App() {
   return (
     <div
       style={{
-        minHeight: "100vh",
-        backgroundColor: "#0f172a",
-        color: "white",
+        maxWidth: "1000px",
+        margin: "0 auto",
         padding: "2rem",
       }}
     >
-      <h1>LANDrop</h1>
+      <div
+        style={{
+          marginBottom: "2rem",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "3rem",
+          }}
+        >
+          LANDrop
+        </h1>
 
-      <p>Wireless Local File Transfer</p>
+        <p
+          style={{
+            color: "#94a3b8",
+          }}
+        >
+          Wireless Local File Transfer
+        </p>
+      </div>
 
       <UploadBox onUploadSuccess={refreshFiles} />
 

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import API from "../services/api";
 
 interface UploadBoxProps {
@@ -8,58 +9,131 @@ interface UploadBoxProps {
 export default function UploadBox({
   onUploadSuccess,
 }: UploadBoxProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
-  const handleUpload = async () => {
-    if (!selectedFile) return;
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
+      if (!file) return;
 
-    try {
-      await API.post("/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const formData = new FormData();
+      formData.append("file", file);
 
-      alert("File uploaded successfully!");
+      try {
+        setUploading(true);
+        setProgress(0);
 
-      setSelectedFile(null);
+        await API.post("/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
 
-      onUploadSuccess(); // Refresh file list
-    } catch (error) {
-      console.error(error);
-      alert("Upload failed");
-    }
-  };
+          onUploadProgress: (progressEvent) => {
+            const percent = Math.round(
+              (progressEvent.loaded * 100) /
+                (progressEvent.total || 1)
+            );
+
+            setProgress(percent);
+          },
+        });
+
+        setProgress(100);
+
+        setTimeout(() => {
+          setUploading(false);
+          setProgress(0);
+        }, 500);
+
+        onUploadSuccess();
+      } catch (error) {
+        console.error("Upload failed:", error);
+        setUploading(false);
+        alert("Upload failed");
+      }
+    },
+    [onUploadSuccess]
+  );
+
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+  } = useDropzone({
+    onDrop,
+    multiple: false,
+  });
 
   return (
     <div
+      {...getRootProps()}
       style={{
-        backgroundColor: "#1e293b",
-        padding: "1rem",
-        borderRadius: "12px",
         marginTop: "1rem",
+        padding: "4rem",
+        border: "2px dashed #64748b",
+        borderRadius: "20px",
+        textAlign: "center",
+        cursor: "pointer",
+        backgroundColor: "#1e293b",
+        transition: "0.3s",
       }}
     >
-      <h2>Upload File</h2>
+      <input {...getInputProps()} />
 
-      <input
-        type="file"
-        onChange={(e) =>
-          setSelectedFile(
-            e.target.files ? e.target.files[0] : null
-          )
-        }
-      />
+      {isDragActive ? (
+        <p
+          style={{
+            fontSize: "1.2rem",
+          }}
+        >
+          Drop the file here...
+        </p>
+      ) : (
+        <>
+          <h2>📤 Upload Files</h2>
 
-      <br />
-      <br />
+          <p
+            style={{
+              color: "#94a3b8",
+              marginTop: "0.5rem",
+            }}
+          >
+            Drag & drop a file here, or click to browse
+          </p>
+        </>
+      )}
 
-      <button onClick={handleUpload}>
-        Upload
-      </button>
+      {uploading && (
+        <div
+          style={{
+            marginTop: "1.5rem",
+          }}
+        >
+          <p>Uploading... {progress}%</p>
+
+          <div
+            style={{
+              width: "100%",
+              height: "12px",
+              backgroundColor: "#334155",
+              borderRadius: "999px",
+              overflow: "hidden",
+              marginTop: "0.5rem",
+            }}
+          >
+            <div
+              style={{
+                width: `${progress}%`,
+                height: "100%",
+                backgroundColor: "#22c55e",
+                transition: "width 0.2s ease",
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+} 
